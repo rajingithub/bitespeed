@@ -1,5 +1,5 @@
 from django.urls import path
-from system.views import (
+from contacts.views import (
     ContactView,
 )
 

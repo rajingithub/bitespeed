@@ -1,5 +1,5 @@
 from django.shortcuts import render
-from models import Contact
+from contacts.models import Contact
 from rest_framework.views import APIView
 from django.db.models import Q
 from rest_framework.response import Response
@@ -25,17 +25,27 @@ class ContactView(APIView):
                 'linkPrecedence':'primary'
             }
         else:
+            found = 0 
             for contact in contacts:
                 if contact.linkPrecedence == 'primary':
                     primary_contact = contact
+                    found = 1
                     break
+            if not found:
+                primary_contact = Contact.objects.filter(id = contacts[0].linkedId)[0]
+                contacts = list(contacts)
+                contacts.append(primary_contact)
+
             new_contact = {
                 'phoneNumber' : request.data['phoneNumber'] if 'phoneNumber' in request.data else None,
                 'email': request.data['email'] if 'email' in request.data else None,
-                'linkedId':primary_contact.id,
+                'linkedId':primary_contact.id
+                # 'linkedId':primary_contact
             }
         contact = Contact.objects.create(**new_contact)
+        contacts = list(contacts)
         contacts.append(contact)
+
         data = dict()
         primaryContatctId,emails,phoneNumbers,secondaryContactIds = None,list(),list(),list()
         for contact in contacts:
@@ -51,8 +61,8 @@ class ContactView(APIView):
                 secondaryContactIds.append(contact.id)
         data = {
             'primaryContatctId' : primaryContatctId,
-            'emails' : emails,
-            'phoneNumbers' : phoneNumbers,
-            'secondaryContactIds':secondaryContactIds
+            'emails' : set(emails),
+            'phoneNumbers' : set(phoneNumbers),
+            'secondaryContactIds':set(secondaryContactIds)
         }
         return Response({"contact":data})
