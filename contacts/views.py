@@ -18,14 +18,13 @@ class ContactView(APIView):
         
         contacts = Contact.objects.filter((query))
         new_contact = dict()
-        if not primary_contact:
+        if not contacts: # No contact is found, then this is the primary contact
             new_contact = {
                 'phoneNumber' : request.data['phoneNumber'] if 'phoneNumber' in request.data else None,
                 'email': request.data['email'] if 'email' in request.data else None,
                 'linkPrecedence':'primary'
             }
         else:
-            
             for contact in contacts:
                 if contact.linkPrecedence == 'primary':
                     primary_contact = contact
@@ -56,78 +55,4 @@ class ContactView(APIView):
             'phoneNumbers' : phoneNumbers,
             'secondaryContactIds':secondaryContactIds
         }
-        
-        
-            
-            
-                
-                
-            
-            
-        
-        
-            
-        
-
-
-
-
-
-
-
-# class ContactView(APIView):
-#     def post(self, request):
-#         kwargs = dict()
-#         if 'email' in request.data:
-#             kwargs['email'] = request.data['email']
-#         if 'phoneNumber' in request.data:
-#             kwargs['phoneNumber'] = request.data['phoneNumber']
-#         kwargs['linkPrecedence'] = 'primary'
-#         contacts = Contact.objects.filter(**kwargs) # primary_contact
-#         if not contacts:
-#             contact = Contact()
-#             if 'email' in request.data:
-#                 contact.email = request.data['email']
-#             if 'phoneNumber' in request.data:
-#                 contact.phoneNumber = request.data['phoneNumber']
-#             contact.linkPrecedence = 'primary'
-#             new_contact = contact.save()
-#         else: # seconday
-#             contact = Contact()
-#             if 'email' in request.data:
-#                 contact.email = request.data['email']
-#             if 'phoneNumber' in request.data:
-#                 contact.phoneNumber = request.data['phoneNumber']
-#             contact.linkedId = contacts[0].id
-#             new_contact = contact.save()
-#         all_contacts = Contact.objects.all()
-#         primaryContatctId,secondaryContactIds = None,list()
-#         emails,phoneNumbers = list(),list()
-#         for contact in all_contacts:
-#             if contact.linkPrecedence == 'primary':
-#                 primaryContatctId = contact.id
-#             if contact.linkPrecedence == 'secondary':
-#                 secondaryContactIds.append(contact.id)
-#             if contact.email:
-#                 emails.append(contact.email)
-#             if contact.phoneNumber:
-#                 phoneNumbers.append(contact.phoneNumber)
-#         data = {
-#             "primaryContatctId" : primaryContatctId,
-#             "emails" : emails,
-#             "phoneNumbers" : phoneNumbers,
-#             "secondaryContactIds":secondaryContactIds
-#         }
-#         return {"data": {"contact":data}}
-            
-                
-            
-            
-            
-            
-            
-            
-        
-        
-            
-            
+        return Response({"contact":data})
