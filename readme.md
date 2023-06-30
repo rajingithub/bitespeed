@@ -2,7 +2,8 @@ bitespeed assignment
 
 API endpoint to hit:
 
-(POST) http://127.0.0.1:8000/contacts/identify/  ** [ http://<<host>>:<<port>>/contacts/identify/]**
+(POST) http://127.0.0.1:8000/contacts/identify/
+
 with request body like :
 {
 "email":"george@hillvalley.edu",
